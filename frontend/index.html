@@ -4,3 +4,22 @@
   <button type="submit">Calculate</button>
 </form>
 <div id="results"></div>
+<script src="subnet.js"></script>
+<script>
+  document.getElementById('subnetForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cidr = document.getElementById('ip').value.trim();
+    try {
+      const info = calculateSubnet(cidr);
+      document.getElementById('results').innerHTML = `
+        <p>Network: ${info.network}/${info.prefixLen}</p>
+        <p>Netmask: ${info.netmask}</p>
+        <p>Broadcast: ${info.broadcast}</p>
+        <p>Host range: ${info.hostMin} – ${info.hostMax}</p>
+        <p>Usable hosts: ${info.numHosts}</p>
+      `;
+    } catch (err) {
+      document.getElementById('results').textContent = "Invalid CIDR — please check input.";
+    }
+  });
+</script>
