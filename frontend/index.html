@@ -1,3 +1,10 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subnet Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 <form id="subnetForm">
   <label>IP Address/CIDR:</label>
   <input type="text" id="ip" placeholder="e.g. 192.168.0.0/24" required>
@@ -23,3 +30,21 @@
     }
   });
 </script>
+<body>
+  <div class="container">
+    <h1>Subnet Calculator</h1>
+    <form id="subnetForm">
+      <label for="cidr">Enter CIDR Notation (e.g. 192.168.1.0/24):</label>
+      <input type="text" id="cidr" name="cidr" required />
+      <button type="submit">Calculate</button>
+    </form>
+
+    <div id="result" class="result hidden">
+      <h2>Results</h2>
+      <ul id="resultList"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>  
