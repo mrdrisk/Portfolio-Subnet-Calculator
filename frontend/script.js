@@ -85,3 +85,55 @@ document.getElementById('subnetForm').addEventListener('submit', function (e) {
     resultBox.classList.add('hidden');
   }
 });
+
+// Key under which we'll store the history array
+const STORAGE_KEY = 'subnetHistory';
+
+function loadHistory() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+function saveHistoryEntry(entry) {
+  const history = loadHistory();
+  history.unshift(entry);          // newest first
+  if (history.length > 20) history.pop();  // cap size
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
+
+function renderHistory() {
+  const history = loadHistory();
+  const historyDiv = document.getElementById('history');
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+
+  if (history.length === 0) {
+    historyDiv.classList.add('hidden');
+    return;
+  }
+  historyDiv.classList.remove('hidden');
+
+  history.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.input} → ${item.network}/${item.prefixLen}`;
+    list.appendChild(li);
+  });
+}
+
+// On page load
+renderHistory();
+
+// In your submit handler, after computing and displaying `result`:
+const entry = {
+  input:   input,                   // the CIDR string
+  network: result.network,
+  prefixLen: result.prefixLen
+};
+saveHistoryEntry(entry);
+renderHistory();
+
+// Clear history button
+document.getElementById('clearHistory').addEventListener('click', () => {
+  localStorage.removeItem(STORAGE_KEY);
+  renderHistory();
+});
