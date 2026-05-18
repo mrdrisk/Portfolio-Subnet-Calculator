@@ -1,56 +1,76 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Subnet Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<form id="subnetForm">
-  <label>IP Address/CIDR:</label>
-  <input type="text" id="ip" placeholder="e.g. 192.168.0.0/24" required>
-  <button type="submit">Calculate</button>
-</form>
-<div id="results"></div>
-<script src="subnet.js"></script>
-<script>
-  document.getElementById('subnetForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const cidr = document.getElementById('ip').value.trim();
-    try {
-      const info = calculateSubnet(cidr);
-      document.getElementById('results').innerHTML = `
-        <p>Network: ${info.network}/${info.prefixLen}</p>
-        <p>Netmask: ${info.netmask}</p>
-        <p>Broadcast: ${info.broadcast}</p>
-        <p>Host range: ${info.hostMin} – ${info.hostMax}</p>
-        <p>Usable hosts: ${info.numHosts}</p>
-      `;
-    } catch (err) {
-      document.getElementById('results').textContent = "Invalid CIDR — please check input.";
-    }
-  });
-</script>
 <body>
-  <div class="container">
-    <h1>Subnet Calculator</h1>
-    <form id="subnetForm">
-      <label for="cidr">Enter CIDR Notation (e.g. 192.168.1.0/24):</label>
-      <input type="text" id="cidr" name="cidr" required />
-      <button type="submit">Calculate</button>
-    </form>
-
-    <div id="result" class="result hidden">
-      <h2>Results</h2>
-      <ul id="resultList"></ul>
-    </div>
+ 
+  <div class="page">
+ 
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-bracket">[</span>
+          subnet
+          <span class="logo-accent">.calc</span>
+          <span class="logo-bracket">]</span>
+        </div>
+        <p class="tagline">IPv4 subnet calculator — CIDR notation</p>
+      </div>
+    </header>
+ 
+    <main class="main">
+ 
+      <section class="card input-card">
+        <form id="subnetForm" novalidate>
+          <label class="field-label" for="cidr">IP Address / CIDR</label>
+          <div class="input-row">
+            <input
+              type="text"
+              id="cidr"
+              name="cidr"
+              class="cidr-input"
+              placeholder="192.168.1.0/24"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <button type="submit" class="calc-btn">Calculate</button>
+          </div>
+          <p id="errorMsg" class="error-msg hidden" role="alert"></p>
+        </form>
+      </section>
+ 
+      <section id="result" class="card result-card hidden" aria-live="polite">
+        <h2 class="card-title">Results</h2>
+        <ul id="resultList" class="result-list"></ul>
+      </section>
+ 
+      <section id="history" class="card history-card hidden">
+        <div class="history-header">
+          <h2 class="card-title">History</h2>
+          <button id="clearHistory" class="clear-btn">Clear</button>
+        </div>
+        <ul id="historyList" class="history-list"></ul>
+      </section>
+ 
+    </main>
+ 
+    <footer class="site-footer">
+      <p>Built by <a href="https://github.com/mrdrisk" target="_blank" rel="noopener">Matt Driscoll</a></p>
+    </footer>
+ 
   </div>
-
-    <div id="history" class="history hidden">
-    <h2>History</h2>
-    <ul id="historyList"></ul>
-    <button id="clearHistory">Clear History</button>
-  </div>
-
+ 
+  <!-- Load core logic first, then UI controller -->
+  <script src="subnet.js"></script>
   <script src="script.js"></script>
+ 
 </body>
-</html>  
+</html>
