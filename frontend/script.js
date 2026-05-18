@@ -1,139 +1,140 @@
-document.getElementById('subnetForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const cidr = document.getElementById('ip').value;
-  // Example: split into IP and mask, compute network and broadcast
-  const [ip, prefix] = cidr.split('/');
-  // Convert IP to binary, apply mask, etc.
-  // (Alternatively, use a library or custom functions)
-  document.getElementById('results').innerHTML = `
-    <p>Network: ${networkAddr}</p>
-    <p>Broadcast: ${broadcastAddr}</p>
-    <p>Host Range: ${hostMin} - ${hostMax}</p>
-  `;
-  // Save to localStorage for history:contentReference[oaicite:9]{index=9}
-  let history = JSON.parse(localStorage.getItem('history')||'[]');
-  history.push(cidr);
-  localStorage.setItem('history', JSON.stringify(history));
-});
-function ipToInt(ip) {
-  return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0);
-}
-
-function intToIp(int) {
-  return [24, 16, 8, 0].map(shift => (int >>> shift) & 255).join('.');
-}
-
-function calculateSubnet(cidr) {
-  const [ipStr, prefixStr] = cidr.split('/');
-  const prefixLen = parseInt(prefixStr, 10);
-
-  if (!ipStr || isNaN(prefixLen) || prefixLen < 0 || prefixLen > 32) {
-    throw new Error('Invalid CIDR format');
-  }
-
-  const ipInt = ipToInt(ipStr);
-  const maskInt = prefixLen === 0 ? 0 : 0xFFFFFFFF << (32 - prefixLen);
-  const networkInt = ipInt & maskInt;
-  const broadcastInt = networkInt | (~maskInt >>> 0);
-  const total = broadcastInt - networkInt + 1;
-
-  let hostMin = "N/A", hostMax = "N/A", numHosts = 0;
-  if (total > 2) {
-    hostMin = intToIp(networkInt + 1);
-    hostMax = intToIp(broadcastInt - 1);
-    numHosts = total - 2;
-  }
-
-  return {
-    network: intToIp(networkInt),
-    broadcast: intToIp(broadcastInt),
-    netmask: intToIp(maskInt),
-    prefixLen,
-    hostMin,
-    hostMax,
-    numHosts
-  };
-}
-
-document.getElementById('subnetForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-  const input = document.getElementById('cidr').value.trim();
-  const resultBox = document.getElementById('result');
-  const resultList = document.getElementById('resultList');
-  resultList.innerHTML = '';
-
-  try {
-    const result = calculateSubnet(input);
-
-    const entries = [
-      ['Network', `${result.network}/${result.prefixLen}`],
-      ['Netmask', result.netmask],
-      ['Broadcast', result.broadcast],
-      ['Host Range', `${result.hostMin} – ${result.hostMax}`],
-      ['Usable Hosts', result.numHosts],
-    ];
-
-    entries.forEach(([label, value]) => {
-      const li = document.createElement('li');
-      li.textContent = `${label}: ${value}`;
-      resultList.appendChild(li);
-    });
-
-    resultBox.classList.remove('hidden');
-  } catch (err) {
-    alert("Invalid CIDR input. Please try again.");
-    resultBox.classList.add('hidden');
-  }
-});
-
-// Key under which we'll store the history array
-const STORAGE_KEY = 'subnetHistory';
-
+/**
+ * script.js
+ * UI controller for the subnet calculator.
+ * Depends on subnet.js being loaded first.
+ */
+ 
+const HISTORY_KEY = 'subnetHistory';
+const HISTORY_LIMIT = 20;
+ 
+// ── DOM references ────────────────────────────────────────────────────────────
+ 
+const form        = document.getElementById('subnetForm');
+const input       = document.getElementById('cidr');
+const resultBox   = document.getElementById('result');
+const resultList  = document.getElementById('resultList');
+const historyBox  = document.getElementById('history');
+const historyList = document.getElementById('historyList');
+const clearBtn    = document.getElementById('clearHistory');
+const errorMsg    = document.getElementById('errorMsg');
+ 
+// ── History helpers ───────────────────────────────────────────────────────────
+ 
 function loadHistory() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : [];
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+  } catch {
+    return [];
+  }
 }
-
-function saveHistoryEntry(entry) {
+ 
+function saveToHistory(cidr, result) {
   const history = loadHistory();
-  history.unshift(entry);          // newest first
-  if (history.length > 20) history.pop();  // cap size
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  // Avoid duplicates at the top
+  if (history.length > 0 && history[0].cidr === cidr) return;
+  history.unshift({ cidr, network: result.network, prefixLen: result.prefixLen });
+  if (history.length > HISTORY_LIMIT) history.pop();
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
-
+ 
 function renderHistory() {
   const history = loadHistory();
-  const historyDiv = document.getElementById('history');
-  const list = document.getElementById('historyList');
-  list.innerHTML = '';
-
+ 
   if (history.length === 0) {
-    historyDiv.classList.add('hidden');
+    historyBox.classList.add('hidden');
     return;
   }
-  historyDiv.classList.remove('hidden');
-
-  history.forEach(item => {
+ 
+  historyBox.classList.remove('hidden');
+  historyList.innerHTML = '';
+ 
+  history.forEach(entry => {
     const li = document.createElement('li');
-    li.textContent = `${item.input} → ${item.network}/${item.prefixLen}`;
-    list.appendChild(li);
+ 
+    const label = document.createElement('span');
+    label.className = 'history-input';
+    label.textContent = entry.cidr;
+ 
+    const arrow = document.createElement('span');
+    arrow.className = 'history-arrow';
+    arrow.textContent = '→';
+ 
+    const value = document.createElement('span');
+    value.className = 'history-network';
+    value.textContent = `${entry.network}/${entry.prefixLen}`;
+ 
+    // Click a history entry to re-run it
+    li.addEventListener('click', () => {
+      input.value = entry.cidr;
+      form.requestSubmit();
+    });
+ 
+    li.append(label, arrow, value);
+    historyList.appendChild(li);
   });
 }
-
-// On page load
-renderHistory();
-
-// In your submit handler, after computing and displaying `result`:
-const entry = {
-  input:   input,                   // the CIDR string
-  network: result.network,
-  prefixLen: result.prefixLen
-};
-saveHistoryEntry(entry);
-renderHistory();
-
-// Clear history button
-document.getElementById('clearHistory').addEventListener('click', () => {
-  localStorage.removeItem(STORAGE_KEY);
+ 
+// ── Result rendering ──────────────────────────────────────────────────────────
+ 
+function renderResult(result) {
+  resultList.innerHTML = '';
+ 
+  const rows = [
+    ['Network Address', `${result.network}/${result.prefixLen}`],
+    ['Subnet Mask',     result.netmask],
+    ['Wildcard Mask',   result.wildcardMask],
+    ['Broadcast',       result.broadcast],
+    ['Host Range',      result.hostMin ? `${result.hostMin} – ${result.hostMax}` : 'N/A'],
+    ['Usable Hosts',    result.numHosts.toLocaleString()],
+    ['Total Addresses', result.totalAddresses.toLocaleString()],
+    ['IP Class',        result.ipClass],
+    ['Scope',           result.isPrivate ? 'Private (RFC 1918)' : 'Public'],
+  ];
+ 
+  rows.forEach(([label, value]) => {
+    const li = document.createElement('li');
+ 
+    const labelEl = document.createElement('span');
+    labelEl.className = 'result-label';
+    labelEl.textContent = label;
+ 
+    const valueEl = document.createElement('span');
+    valueEl.className = 'result-value';
+    valueEl.textContent = value;
+ 
+    li.append(labelEl, valueEl);
+    resultList.appendChild(li);
+  });
+ 
+  resultBox.classList.remove('hidden');
+}
+ 
+// ── Event handlers ────────────────────────────────────────────────────────────
+ 
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+ 
+  const cidr = input.value.trim();
+  errorMsg.textContent = '';
+  errorMsg.classList.add('hidden');
+  resultBox.classList.add('hidden');
+ 
+  try {
+    const result = calculateSubnet(cidr);
+    renderResult(result);
+    saveToHistory(cidr, result);
+    renderHistory();
+  } catch (err) {
+    errorMsg.textContent = err.message;
+    errorMsg.classList.remove('hidden');
+  }
+});
+ 
+clearBtn.addEventListener('click', () => {
+  localStorage.removeItem(HISTORY_KEY);
   renderHistory();
 });
+ 
+// ── Init ──────────────────────────────────────────────────────────────────────
+ 
+renderHistory();
