@@ -12,6 +12,11 @@ Usage:
  
 import argparse
 import sys
+import os
+ 
+# Ensure cli/ sibling modules (subnet_utils, history) are always importable
+# regardless of working directory or how this script is invoked.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
  
 from subnet_utils import calculate_subnet
 from history import save_entry, print_history
