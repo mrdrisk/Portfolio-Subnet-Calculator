@@ -1,5 +1,5 @@
 [![CI](https://github.com/mrdrisk/Portfolio-Subnet-Calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/mrdrisk/Portfolio-Subnet-Calculator/actions/workflows/ci.yml)
-
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://mrdrisk.github.io/Portfolio-Subnet-Calculator)
 # subnet.calc
  
 A browser-based IPv4 subnet calculator built with vanilla HTML, CSS, and JavaScript. No dependencies, no frameworks — just clean networking logic and a sharp UI.
