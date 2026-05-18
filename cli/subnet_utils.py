@@ -44,6 +44,12 @@ def calculate_subnet(cidr: str) -> Dict[str, str]:
     Raises:
         ValueError: if the input is not valid CIDR notation.
     """
+    if '/' not in cidr:
+        raise ValueError(
+            f'"{cidr}" is missing a prefix length. '
+            "Expected format: x.x.x.x/prefix (e.g. 192.168.1.0/24)"
+        )
+ 
     try:
         net = ipaddress.ip_network(cidr, strict=False)
     except ValueError:
@@ -89,3 +95,4 @@ def calculate_subnet(cidr: str) -> Dict[str, str]:
         "ip_class":        get_ip_class(network_addr),
         "scope":           get_scope(net),
     }
+ 
