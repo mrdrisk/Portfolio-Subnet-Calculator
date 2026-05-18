@@ -62,9 +62,8 @@ def calculate_subnet(cidr: str) -> Dict[str, str]:
  
     # Host range — handle /31 (RFC 3021) and /32 as special cases
     if prefix_len <= 30:
-        hosts    = list(net.hosts())
-        host_min = str(hosts[0])
-        host_max = str(hosts[-1])
+        host_min  = str(net.network_address + 1)
+        host_max  = str(net.broadcast_address - 1)
         num_hosts = total - 2
     elif prefix_len == 31:
         # RFC 3021: both addresses usable on point-to-point links
