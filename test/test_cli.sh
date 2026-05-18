@@ -8,7 +8,7 @@
 #
 # Exit code: 0 if all tests pass, 1 if any fail.
  
-set -euo pipefail
+set -uo pipefail
  
 CLI="python3 cli/subnet_calc.py"
 PASS=0
@@ -25,12 +25,12 @@ assert_contains() {
  
   if echo "$actual" | grep -qF "$expected"; then
     echo "  PASS  $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL  $name"
     echo "        expected to find: $expected"
     echo "        in output:        $(echo "$actual" | head -3)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
     ERRORS+=("$name")
   fi
 }
@@ -43,11 +43,11 @@ assert_exit_code() {
  
   if [[ "$actual" -eq "$expected" ]]; then
     echo "  PASS  $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL  $name"
     echo "        expected exit code $expected, got $actual"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
     ERRORS+=("$name")
   fi
 }
