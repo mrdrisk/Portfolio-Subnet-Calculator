@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subnet Calculator</title>
+  <meta name="theme-color" content="#09090b" />
+  <meta name="description" content="IPv4 subnet calculator with full CIDR support — network address, broadcast, host range, and more." />
+  <title>subnet.calc — IPv4 Subnet Calculator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
- 
+
   <div class="page">
- 
+
     <header class="site-header">
       <div class="header-inner">
         <div class="logo">
-          <span class="logo-bracket">[</span>
-          subnet
-          <span class="logo-accent">.calc</span>
-          <span class="logo-bracket">]</span>
+          <span class="logo-bracket">[</span>subnet<span class="logo-accent">.calc</span><span class="logo-bracket">]</span>
         </div>
-        <p class="tagline">IPv4 subnet calculator — CIDR notation</p>
+        <p class="tagline">IPv4 subnet calculator — enter any address in CIDR notation</p>
       </div>
     </header>
- 
+
     <main class="main">
- 
+
       <section class="card input-card">
         <form id="subnetForm" novalidate>
           <label class="field-label" for="cidr">IP Address / CIDR</label>
@@ -46,31 +45,30 @@
           <p id="errorMsg" class="error-msg hidden" role="alert"></p>
         </form>
       </section>
- 
+
       <section id="result" class="card result-card hidden" aria-live="polite">
         <h2 class="card-title">Results</h2>
         <ul id="resultList" class="result-list"></ul>
       </section>
- 
+
       <section id="history" class="card history-card hidden">
         <div class="history-header">
           <h2 class="card-title">History</h2>
-          <button id="clearHistory" class="clear-btn">Clear</button>
+          <button id="clearHistory" class="clear-btn" type="button">Clear</button>
         </div>
         <ul id="historyList" class="history-list"></ul>
       </section>
- 
+
     </main>
- 
+
     <footer class="site-footer">
       <p>Built by <a href="https://github.com/mrdrisk" target="_blank" rel="noopener">Matt Driscoll</a></p>
     </footer>
- 
+
   </div>
- 
-  <!-- Load core logic first, then UI controller -->
+
   <script src="subnet.js"></script>
   <script src="script.js"></script>
- 
+
 </body>
 </html>
