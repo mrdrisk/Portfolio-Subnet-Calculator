@@ -6,9 +6,10 @@
  
 const HISTORY_KEY = 'subnetHistory';
 const HISTORY_LIMIT = 20;
- 
+const THEME_KEY = 'subnetTheme';
+
 // ── DOM references ────────────────────────────────────────────────────────────
- 
+
 const form        = document.getElementById('subnetForm');
 const input       = document.getElementById('cidr');
 const resultBox   = document.getElementById('result');
@@ -17,6 +18,34 @@ const historyBox  = document.getElementById('history');
 const historyList = document.getElementById('historyList');
 const clearBtn    = document.getElementById('clearHistory');
 const errorMsg    = document.getElementById('errorMsg');
+const themeToggle = document.getElementById('themeToggle');
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+
+const THEME_COLORS = { dark: '#09090b', light: '#f4f4f5' };
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = THEME_COLORS[theme];
+  if (themeToggle) {
+    themeToggle.checked = theme === 'dark';
+    themeToggle.setAttribute('aria-checked', theme === 'dark');
+  }
+}
+
+function initTheme() {
+  const stored = localStorage.getItem(THEME_KEY);
+  applyTheme(stored === 'light' ? 'light' : 'dark');
+}
+
+if (themeToggle) {
+  themeToggle.addEventListener('change', () => {
+    const theme = themeToggle.checked ? 'dark' : 'light';
+    localStorage.setItem(THEME_KEY, theme);
+    applyTheme(theme);
+  });
+}
  
 // ── History helpers ───────────────────────────────────────────────────────────
  
@@ -136,5 +165,6 @@ clearBtn.addEventListener('click', () => {
 });
  
 // ── Init ──────────────────────────────────────────────────────────────────────
- 
+
+initTheme();
 renderHistory();

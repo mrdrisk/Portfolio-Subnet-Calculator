@@ -10,6 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    (function () {
+      var theme = localStorage.getItem('subnetTheme');
+      if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
 </head>
 <body>
 
@@ -17,8 +24,24 @@
 
     <header class="site-header">
       <div class="header-inner">
-        <div class="logo">
-          <span class="logo-bracket">[</span>subnet<span class="logo-accent">.calc</span><span class="logo-bracket">]</span>
+        <div class="header-top">
+          <div class="logo">
+            <span class="logo-bracket">[</span>subnet<span class="logo-accent">.calc</span><span class="logo-bracket">]</span>
+          </div>
+          <label class="theme-switch" for="themeToggle">
+            <span class="theme-switch-label">Dark mode</span>
+            <input
+              type="checkbox"
+              id="themeToggle"
+              class="theme-switch-input"
+              role="switch"
+              aria-label="Dark mode"
+              checked
+            />
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb"></span>
+            </span>
+          </label>
         </div>
         <p class="tagline">IPv4 subnet calculator — enter any address in CIDR notation</p>
       </div>
